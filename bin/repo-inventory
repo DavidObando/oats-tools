@@ -1,0 +1,20 @@
+#!/bin/sh
+# repo-inventory — print a quick structural summary of the repository in
+# the current directory: file counts by extension and the largest files.
+# Usage: repo-inventory [path]
+# Example seed tool demonstrating the oats-tools contract; also handy for
+# the worker's first look at an unfamiliar repository.
+set -eu
+
+root="${1:-.}"
+cd "$root"
+
+echo "== files by extension =="
+find . -type f -not -path './.git/*' \
+  | sed -n 's/.*\.\([A-Za-z0-9_]\{1,10\}\)$/\1/p' \
+  | sort | uniq -c | sort -rn | head -20
+
+echo
+echo "== largest files (KiB) =="
+find . -type f -not -path './.git/*' -exec du -k {} + \
+  | sort -rn | head -10
